@@ -1,8 +1,18 @@
 import streamlit as st
 import pandas as pd
 import numpy as np
+import sqlite3
 
+conn = sqlite3.connect('carterms.db')
+cursor = conn.cursor()
+#creates table if it isn't there
 
+cursor.execute('''
+    CREATE TABLE IF NOT EXISTS terms (
+        Japanese TEXT ,
+        English  TEXT
+    )
+''')
 
 
 
@@ -28,6 +38,15 @@ toggle_label = (
     else "Japanese to English"
 )
 toggle_value = st.session_state.get("my_toggle", False)
+for i in range(len(df)):
+    x = df.iloc[i,0]
+    y = df.iloc[i,1]
+    query = '''INSERT INTO terms (Japanese, English) 
+                    VALUES (?, ?)'''
+
+    # Execute the query with the provided values
+    cursor.execute(query, (x, y))
+    conn.commit()
 
 for i in range(len(df)):
         x = df.iloc[i,0]
