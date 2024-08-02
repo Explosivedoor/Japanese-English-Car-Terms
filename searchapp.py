@@ -11,7 +11,7 @@ cursor = conn.cursor()
 
 
 
-@st.cache_data(show_spinner =True)
+#@st.cache_data(show_spinner =True)
 def load_data():
     # Read the Excel file
     df = pd.read_sql_query("SELECT * FROM terms", conn)
@@ -23,6 +23,12 @@ df = load_data()
 En={}
 Jp={}
 df.columns = ['Jp', 'En']
+
+for i in range(len(df)):
+        x = df.iloc[i,0]
+        y = df.iloc[i,1]
+        En[x] = y
+        Jp[y] = x
 toggle_label = (
     "English to Japanese"
     if st.session_state.get("my_toggle", False)
@@ -31,11 +37,7 @@ toggle_label = (
 toggle_value = st.session_state.get("my_toggle", False)
 
 
-for i in range(len(df)):
-        x = df.iloc[i,0]
-        y = df.iloc[i,1]
-        En[x] = y
-        Jp[y] = x
+
 
 
 on = st.toggle(toggle_label, value = toggle_value,key="my_toggle")
@@ -45,7 +47,7 @@ if on == True:
         print_lang = 0
         dic = En
 else:
-        Jp[x] = y
+        
         lang = "Jp"
         print_lang = 1
         dic = Jp
@@ -59,9 +61,9 @@ option = st.selectbox(
 )
 try:
     escaped_option = re.escape(option)
-   
+    # Ensure that any parentheses are balanced
     pattern = f"({escaped_option})"
-    
+    # Filter rows
     filtered_rows = df[df[lang].str.contains(pattern, case=False, na=False)]
     #st.write(filtered_rows)
     for i in df.iloc[filtered_rows.index,print_lang]:
